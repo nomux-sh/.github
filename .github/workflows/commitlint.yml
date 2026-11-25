@@ -1,9 +1,13 @@
-# Reusable Conventional Commits check for nomux repositories.
+# Reusable commit message check for nomux repositories.
 #
 # Call this workflow from a `pull_request` event. It has no inputs.
-# The pull request title and the subject of each commit must agree with
-# Conventional Commits 1.0.0: `type(scope)!: description`.
+# The pull request title and each commit message must obey the commit rules
+# in CONTRIBUTING.md: `type: description`, no scope, 72 characters at most,
+# no Co-authored-by line and no "generated with" line.
 # Merge commits are skipped.
+#
+# The rules are the same as in standards/commit-msg. Change the two files
+# together.
 name: Commit lint
 
 on:
@@ -34,31 +38,42 @@ jobs:
           ref: refs/pull/${{ github.event.pull_request.number }}/head
           fetch-depth: 0
           persist-credentials: false
-      - name: Check the pull request title and the commit subjects
+      - name: Check the pull request title and the commit messages
         run: |
           set -euo pipefail
           types='build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test'
-          pattern="^($types)(\([a-z0-9._/-]+\))?!?: [^ ].*$"
+          pattern="^($types)!?: [^ ].*$"
+          forbidden='^[[:space:]]*(co-authored-by:|generated (with|by) )'
           bad=0
-          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+          problem() {
             bad=$((bad + 1))
-            echo "::error::The pull request title does not agree with Conventional Commits."
-            echo "  title: $PR_TITLE"
+            echo "::error::$1"
+            echo "  $2"
+          }
+          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+            problem "The pull request title does not have the format 'type: description'." "title: $PR_TITLE"
+          fi
+          if [ "${#PR_TITLE}" -gt 70 ]; then
+            problem "The pull request title is longer than 70 characters." "title: $PR_TITLE"
           fi
           total=0
           while read -r sha; do
             total=$((total + 1))
             subject="$(git log -1 --format=%s "$sha")"
-            if [[ "$subject" =~ $pattern ]]; then
-              continue
+            if [[ ! "$subject" =~ $pattern ]]; then
+              problem "The subject of commit ${sha:0:12} does not have the format 'type: description'." "subject: $subject"
             fi
-            bad=$((bad + 1))
-            echo "::error::The subject of commit ${sha:0:12} does not agree with Conventional Commits."
-            echo "  subject: $subject"
+            if [ "${#subject}" -gt 72 ]; then
+              problem "The subject of commit ${sha:0:12} is longer than 72 characters." "subject: $subject"
+            fi
+            if git log -1 --format=%B "$sha" | grep -Eiq "$forbidden"; then
+              problem "Commit ${sha:0:12} has a Co-authored-by or a 'generated with' line." "subject: $subject"
+            fi
           done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
           echo "Commits checked: $total. Problems found: $bad."
           if [ "$bad" -gt 0 ]; then
-            echo "Format: type(scope)!: description. The scope and the '!' are optional."
+            echo "Format: type: description. No scope. Add '!' before the colon for a breaking change."
             echo "Types: ${types//|/, }."
+            echo "Signed-off-by is the only permitted trailer."
             exit 1
           fi

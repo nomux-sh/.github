@@ -1,6 +1,6 @@
 # Support
 
-nomux is in development. There is no public release, and there is no guaranteed response time.
+nomux is in development. Versions earlier than 1.0.0 are pre-releases. There is no guaranteed response time.
 
 | Subject | Where to go |
 |---|---|

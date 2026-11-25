@@ -1,4 +1,4 @@
-<!-- The title must agree with Conventional Commits: type(scope)!: description -->
+<!-- Title format: type: description (no scope, 70 characters at most) -->
 
 ## Summary
 
@@ -14,8 +14,7 @@
 
 ## Checklist
 
-- [ ] Each commit has a `Signed-off-by` trailer (`git commit -s`).
-- [ ] The title and the commit subjects agree with Conventional Commits.
+- [ ] Each commit has one subject line (`type: description`) and the `Signed-off-by` trailer. No other trailer.
 - [ ] The change has tests, or the summary explains why tests are not applicable.
 - [ ] The documentation and the changelog agree with the change.
 - [ ] An architecture change has an approved ADR.

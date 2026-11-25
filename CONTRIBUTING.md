@@ -38,33 +38,53 @@ CI checks the trailer of each commit in a pull request.
 
 ## Commit messages
 
-Commit subjects and pull request titles must agree with [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/):
+A commit message is one subject line and the `Signed-off-by` trailer:
 
 ```text
-type(scope)!: description
+type: description
 ```
 
 - The permitted types are `build`, `chore`, `ci`, `docs`, `feat`, `fix`, `perf`, `refactor`, `revert`, `style` and `test`.
-- The scope is optional. Use lowercase letters.
-- Add `!` for a breaking change.
+- Do not use a scope.
+- Add `!` before the colon for a breaking change.
+- The subject has 72 characters at most. It says what changed, in plain English.
+- Do not name a phase, a milestone or a ticket in the subject.
+- `Signed-off-by` is the only trailer. Do not add `Co-authored-by`, a tool name or a "generated with" line.
 
 Examples:
 
 ```text
-feat(transport): add credit windows to the QUIC channel
-fix(holder): close the PTY when the child exits
+feat: add credit windows to the QUIC channel
+fix: close the PTY when the child exits
 docs: add the glossary entry for "session"
 ```
 
-CI checks the pull request title and each commit subject. The changelog comes from these messages with `git-cliff`.
+Each repository has a commit hook that does this check. Enable it one time in each clone:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+CI does the same check on the pull request title and on each commit. The changelog comes from these messages with `git-cliff`.
 
 ## Pull requests
 
-- Make one logical change in each pull request.
-- Add tests for the change.
-- Make sure that all CI checks pass.
-- Fill in the pull request template.
+- Make one logical change in each pull request. Use a short branch name that names the change.
+- The title has the format of a commit subject, 70 characters at most.
+- The description says what changed and why. Then it shows the commands that you ran and their real result.
+- Add tests for the change. Write a small number of tests that catch real regressions.
+- Make sure that all CI checks pass. Do not disable a check.
 - Write code, comments, documentation and commit messages in English.
+
+The maintainers merge with a rebase. Each commit of the pull request goes to `main` unchanged, thus each commit must obey the commit rules. The `main` branch has a linear history and accepts changes only through pull requests.
+
+## Coding agents
+
+Each repository has an `AGENTS.md` file with the rules for coding agents. The same rules apply to people. `CLAUDE.md` and `QWEN.md` refer to `AGENTS.md`. A change that an agent wrote must obey all rules of this guide. The person who opens the pull request is responsible for it.
+
+## Releases
+
+Read the [release guide](RELEASING.md).
 
 ## Architecture changes
 

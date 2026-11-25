@@ -1,0 +1,17 @@
+[
+  {"name": "bug", "color": "d73a4a", "description": "Something does not work as documented"},
+  {"name": "enhancement", "color": "a2eeef", "description": "A new function or a change to a function"},
+  {"name": "documentation", "color": "0075ca", "description": "A change to documentation only"},
+  {"name": "performance", "color": "fbca04", "description": "Speed, memory or idle CPU"},
+  {"name": "security", "color": "b60205", "description": "A security hardening task (not a vulnerability report)"},
+  {"name": "ci", "color": "5319e7", "description": "Workflows, checks and release automation"},
+  {"name": "dependencies", "color": "0366d6", "description": "A dependency update"},
+  {"name": "breaking", "color": "e11d21", "description": "A change that is not backward compatible"},
+  {"name": "adr", "color": "c5def5", "description": "Needs or changes an architecture decision record"},
+  {"name": "good first issue", "color": "7057ff", "description": "A small task with a clear result"},
+  {"name": "help wanted", "color": "008672", "description": "The maintainers want a contribution for this"},
+  {"name": "needs-info", "color": "d876e3", "description": "The report does not have sufficient data"},
+  {"name": "blocked", "color": "000000", "description": "Cannot continue until a different item is done"},
+  {"name": "duplicate", "color": "cfd3d7", "description": "A different issue or pull request has this subject"},
+  {"name": "wontfix", "color": "ffffff", "description": "The maintainers will not do this"}
+]
