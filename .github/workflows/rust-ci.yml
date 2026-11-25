@@ -17,6 +17,13 @@ on:
           The other jobs always run on ubuntu-latest.
         type: string
         default: '["ubuntu-latest"]'
+      clippy-os:
+        description: >-
+          JSON array of runner labels for the `clippy` job. Default: the value
+          of `os`. Set a shorter list to use fewer runners of a type that has
+          a queue.
+        type: string
+        default: ""
       working-directory:
         description: Directory that contains the Cargo workspace.
         type: string
@@ -79,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(inputs.os) }}
+        os: ${{ fromJSON(inputs.clippy-os || inputs.os) }}
     defaults:
       run:
         shell: bash

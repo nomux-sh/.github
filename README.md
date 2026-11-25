@@ -40,7 +40,8 @@ uses: nomux-sh/.github/.github/workflows/<file>@main
 
 | Input | Type | Default | Description |
 |---|---|---|---|
-| `os` | string | `'["ubuntu-latest"]'` | JSON array of runner labels for the `clippy` and `test` jobs. |
+| `os` | string | `'["ubuntu-latest"]'` | JSON array of runner labels for the `test` job and, if `clippy-os` is not set, for the `clippy` job. |
+| `clippy-os` | string | the value of `os` | JSON array of runner labels for the `clippy` job. Set a shorter list to use fewer runners of a type that has a queue. |
 | `working-directory` | string | `.` | Directory that contains the Cargo workspace. |
 | `run-deny` | boolean | `true` | Run the `deny` job. |
 | `run-machete` | boolean | `true` | Run the `machete` job. |
@@ -48,7 +49,7 @@ uses: nomux-sh/.github/.github/workflows/<file>@main
 | Job | Runner | Command |
 |---|---|---|
 | `fmt` | `ubuntu-latest` | `cargo fmt --all --check` |
-| `clippy` | each entry of `os` | `cargo clippy --workspace --all-targets -- -D warnings` |
+| `clippy` | each entry of `clippy-os`, or of `os` | `cargo clippy --workspace --all-targets -- -D warnings` |
 | `test` | each entry of `os` | `cargo nextest run --workspace`, then `cargo test --workspace --doc` |
 | `deny` | `ubuntu-latest` | `cargo deny check` |
 | `machete` | `ubuntu-latest` | `cargo machete` |
