@@ -1,0 +1,64 @@
+# Reusable Conventional Commits check for nomux repositories.
+#
+# Call this workflow from a `pull_request` event. It has no inputs.
+# The pull request title and the subject of each commit must agree with
+# Conventional Commits 1.0.0: `type(scope)!: description`.
+# Merge commits are skipped.
+name: Commit lint
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  commitlint:
+    name: commitlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Require a pull request event
+        run: |
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::error::This workflow reads the pull request title and commits. Call it from a pull_request event."
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check the pull request title and the commit subjects
+        run: |
+          set -euo pipefail
+          types='build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test'
+          pattern="^($types)(\([a-z0-9._/-]+\))?!?: [^ ].*$"
+          bad=0
+          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+            bad=$((bad + 1))
+            echo "::error::The pull request title does not agree with Conventional Commits."
+            echo "  title: $PR_TITLE"
+          fi
+          total=0
+          while read -r sha; do
+            total=$((total + 1))
+            subject="$(git log -1 --format=%s "$sha")"
+            if [[ "$subject" =~ $pattern ]]; then
+              continue
+            fi
+            bad=$((bad + 1))
+            echo "::error::The subject of commit ${sha:0:12} does not agree with Conventional Commits."
+            echo "  subject: $subject"
+          done < <(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA")
+          echo "Commits checked: $total. Problems found: $bad."
+          if [ "$bad" -gt 0 ]; then
+            echo "Format: type(scope)!: description. The scope and the '!' are optional."
+            echo "Types: ${types//|/, }."
+            exit 1
+          fi

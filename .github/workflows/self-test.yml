@@ -1,0 +1,36 @@
+# Runs the reusable Rust and Buf workflows on the fixtures in tests/fixtures.
+# The path filter keeps this workflow out of pull requests that do not change
+# these workflows.
+name: Self-test
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/rust-ci.yml
+      - .github/workflows/buf-ci.yml
+      - .github/workflows/self-test.yml
+      - tests/fixtures/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: self-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: rust
+    uses: ./.github/workflows/rust-ci.yml
+    with:
+      working-directory: tests/fixtures/rust
+
+  buf:
+    name: buf
+    uses: ./.github/workflows/buf-ci.yml
+    with:
+      working-directory: tests/fixtures/buf
+      # The fixture is compared with itself. This shows that the breaking
+      # step runs. It does not show that the step finds a breaking change.
+      breaking-against: ../../../.git#ref=HEAD,subdir=tests/fixtures/buf
