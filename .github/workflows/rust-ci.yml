@@ -1,0 +1,164 @@
+# Reusable Rust CI for nomux repositories.
+#
+# The interface (file name and input names) is a contract. Read README.md
+# before you change it.
+#
+# Caller requirements:
+#   - `rust-toolchain.toml` in the working directory or in a parent directory.
+#   - `deny.toml` in the working directory when `run-deny` is true.
+name: Rust CI
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: >-
+          JSON array of runner labels for the clippy and test jobs.
+          The other jobs always run on ubuntu-latest.
+        type: string
+        default: '["ubuntu-latest"]'
+      working-directory:
+        description: Directory that contains the Cargo workspace.
+        type: string
+        default: .
+      run-deny:
+        description: Run `cargo deny check`.
+        type: boolean
+        default: true
+      run-machete:
+        description: Run `cargo machete`.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - &toolchain
+        name: Install the toolchain from rust-toolchain.toml
+        run: |
+          dir="$PWD"
+          while true; do
+            if [ -f "$dir/rust-toolchain.toml" ] || [ -f "$dir/rust-toolchain" ]; then
+              echo "Toolchain file found in $dir"
+              break
+            fi
+            parent="$(dirname "$dir")"
+            if [ "$parent" = "$dir" ]; then
+              echo "::error::rust-toolchain.toml not found. The caller must pin the toolchain."
+              exit 1
+            fi
+            dir="$parent"
+          done
+          rustup toolchain install
+          rustup component add rustfmt clippy
+          rustup show active-toolchain
+      - name: cargo fmt
+        run: cargo fmt --all --check
+
+  clippy:
+    name: clippy (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.os) }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - *toolchain
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: ${{ inputs.working-directory }}
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(inputs.os) }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - *toolchain
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: ${{ inputs.working-directory }}
+      - uses: taiki-e/install-action@18101caa61cb89118e2ee749786f33c6d1f8a8cb # v2.90.9
+        with:
+          tool: cargo-nextest@0.9.152
+      - name: cargo nextest
+        run: cargo nextest run --workspace
+      # nextest does not run doctests.
+      - name: cargo test --doc
+        run: cargo test --workspace --doc
+
+  deny:
+    name: deny
+    if: ${{ inputs.run-deny }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - *toolchain
+      - uses: taiki-e/install-action@18101caa61cb89118e2ee749786f33c6d1f8a8cb # v2.90.9
+        with:
+          tool: cargo-deny@0.22.1
+      - name: cargo deny
+        run: cargo deny check
+
+  machete:
+    name: machete
+    if: ${{ inputs.run-machete }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: taiki-e/install-action@18101caa61cb89118e2ee749786f33c6d1f8a8cb # v2.90.9
+        with:
+          tool: cargo-machete@0.10.1
+      - name: cargo machete
+        run: cargo machete

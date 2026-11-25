@@ -1,0 +1,11 @@
+# Support
+
+nomux is in development. There is no public release, and there is no guaranteed response time.
+
+| Subject | Where to go |
+|---|---|
+| A bug | Open an issue in the applicable repository. Use the bug report template. |
+| A feature request | Open an issue in the applicable repository. Use the feature request template. |
+| A vulnerability | Do not open an issue. Obey the [security policy](SECURITY.md). |
+| A code of conduct report | Send an email to <we@nomux.sh>. Refer to the [Code of Conduct](CODE_OF_CONDUCT.md). |
+| A contribution | Read the [contribution guide](CONTRIBUTING.md). |

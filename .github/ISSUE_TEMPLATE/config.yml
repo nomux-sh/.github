@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/nomux-sh/.github/blob/main/SECURITY.md
+    about: Do not open an issue for a vulnerability. Obey the security policy.
+  - name: Code of conduct report
+    url: https://github.com/nomux-sh/.github/blob/main/CODE_OF_CONDUCT.md
+    about: Send an email to we@nomux.sh.
