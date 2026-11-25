@@ -1,0 +1,97 @@
+# Reusable repository standard check for nomux repositories.
+#
+# The job checks that the calling repository has the standard files, that the
+# shared files agree with their source in this repository, and that the text
+# does not use the words that the organization rules prohibit.
+name: Repo lint
+
+on:
+  workflow_call:
+    inputs:
+      license:
+        description: "License set of the repository: `code` (LICENSE-MIT and LICENSE-APACHE) or `docs` (LICENSE)."
+        type: string
+        default: code
+      require-changelog:
+        description: Require CHANGELOG.md.
+        type: boolean
+        default: true
+      standards-ref:
+        description: Ref of nomux-sh/.github that has the source of the shared files.
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  repo-lint:
+    name: repo-lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      LICENSE_SET: ${{ inputs.license }}
+      REQUIRE_CHANGELOG: ${{ inputs.require-changelog }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: nomux-sh/.github
+          ref: ${{ inputs.standards-ref }}
+          path: .nomux-standards
+          sparse-checkout: standards
+          persist-credentials: false
+      - name: Check the standard files
+        run: |
+          set -euo pipefail
+          bad=0
+          problem() {
+            bad=$((bad + 1))
+            echo "::error::$1"
+          }
+
+          files="README.md AGENTS.md CLAUDE.md QWEN.md .githooks/commit-msg .github/CODEOWNERS .github/dependabot.yml"
+          case "$LICENSE_SET" in
+            code) files="$files LICENSE-MIT LICENSE-APACHE" ;;
+            docs) files="$files LICENSE" ;;
+            *) problem "Unknown value for the 'license' input: $LICENSE_SET" ;;
+          esac
+          if [ "$REQUIRE_CHANGELOG" = "true" ]; then
+            files="$files CHANGELOG.md"
+          fi
+          for f in $files; do
+            [ -f "$f" ] || problem "The file $f is missing."
+          done
+
+          for f in CLAUDE.md QWEN.md; do
+            if [ -f "$f" ] && ! grep -qx '@AGENTS.md' "$f"; then
+              problem "$f must have the line '@AGENTS.md' and no rules of its own."
+            fi
+          done
+
+          src=.nomux-standards/standards
+          if [ -f AGENTS.md ]; then
+            block="$(sed -n '/^<!-- nomux:common:start -->$/,/^<!-- nomux:common:end -->$/p' AGENTS.md)"
+            if [ "$block" != "$(cat "$src/AGENTS.common.md")" ]; then
+              problem "The organization block of AGENTS.md does not agree with standards/AGENTS.common.md."
+            fi
+          fi
+          if [ -f .githooks/commit-msg ]; then
+            cmp -s .githooks/commit-msg "$src/commit-msg" ||
+              problem ".githooks/commit-msg does not agree with standards/commit-msg."
+            [ -x .githooks/commit-msg ] || problem ".githooks/commit-msg is not executable."
+          fi
+
+          words='delve|robust|seamless|seamlessly|leverage|utilize|harness|pivotal|intricate|furthermore|moreover|notably|cutting-edge|best-in-class'
+          hits="$(git grep -nIiwE "$words" -- . \
+            ':!AGENTS.md' ':!standards/' ':!.nomux-standards/' ':!.github/workflows/repo-lint.yml' \
+            ':!LICENSE*' ':!CODE_OF_CONDUCT.md' ':!*.lock' ':!THIRD_PARTY.md' ':!NOTICE' || true)"
+          if [ -n "$hits" ]; then
+            problem "The text uses words that the organization rules prohibit."
+            echo "$hits"
+          fi
+
+          echo "Problems found: $bad."
+          [ "$bad" -eq 0 ]

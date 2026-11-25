@@ -4,7 +4,7 @@ nomux is a native and lightweight agentic development environment. Sessions stay
 
 ## Status
 
-In development. There is no public release.
+In development. Versions earlier than 1.0.0 are pre-releases: interfaces can change between minor versions.
 
 ## Repositories
 

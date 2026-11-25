@@ -4,13 +4,14 @@ This policy applies to all repositories of the [nomux-sh](https://github.com/nom
 
 ## Supported versions
 
-nomux is in development. There is no public release.
+nomux is in development. Versions earlier than 1.0.0 are pre-releases.
 
 | Version | Supported |
 |---|---|
-| Earlier than 1.0.0 | No |
+| The latest release | Yes |
+| All earlier releases | No |
 
-Versions earlier than 1.0.0 are internal development versions. They do not get security updates. Security support starts with version 1.0.0.
+A correction is released as a new version. Earlier versions do not get updates.
 
 ## How to report a vulnerability
 

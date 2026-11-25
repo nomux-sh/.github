@@ -39,6 +39,13 @@ jobs:
           "$RUNNER_TEMP/actionlint" -version
           "$RUNNER_TEMP/actionlint" -color
 
+  repo-lint:
+    name: repo-lint
+    uses: ./.github/workflows/repo-lint.yml
+    with:
+      require-changelog: false
+      standards-ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
   dco:
     name: dco
     if: ${{ github.event_name == 'pull_request' }}
