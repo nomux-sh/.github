@@ -52,6 +52,13 @@ These rules apply to each repository of the nomux-sh organization. The source of
 
 ### Code
 
+- Keep it simple (KISS). Build only what the task needs now (YAGNI). Have one source for each piece of logic (DRY).
+- Write modern, readable code. Do not write clever code that the reader must decode.
+- One type, one module and one file have one responsibility. Do not make a type that knows or does everything. Split it before it grows.
+- Keep the file tree tidy. A new file goes where its neighbours have the same responsibility. Do not make catch-all directories or files such as `utils`, `common`, `helpers` or `misc`.
+- Give each file, type and function a name that says what it is or does. Do not use abbreviations that the glossary does not have.
+- Keep functions short and at one level of abstraction. Do not nest deeply. Return early.
+- Do not duplicate code. If the same logic is necessary in a second place, move it to one place and call it.
 - Comments: none by default. Write one line only for a reason that the code cannot show.
 - Do not swallow errors. Do not add retries without a known cause.
 - The performance targets of the project come before features. A change that breaks a target is not merged.
@@ -59,9 +66,18 @@ These rules apply to each repository of the nomux-sh organization. The source of
 
 ### Tests
 
-- Write a small number of tests that catch real regressions. Do not write tests that only repeat the current code.
-- A test must fail when the behaviour that it guards is removed.
+- Complete the code first. Write the tests last, and run them when the work is complete.
+- Write the tests that matter: edge cases, behaviour that can break later, and the proof that the current behaviour is correct.
+- Do not write a test only to have a test. Do not test what is obvious or what the compiler already guarantees.
+- A test must fail when the behaviour that it guards is removed or moved.
 - Do not mock the thing that the test examines.
+
+### CI
+
+- CI must be fast. Reviews and CI are the only things that slow a merge.
+- Cache dependencies and build output. Run independent jobs in parallel. Cancel a run when a newer commit arrives.
+- Put slow work (long fuzz runs, benchmarks, full matrix builds) in scheduled runs, not in pull request runs.
+- When you add a CI step, measure the time that it adds and say it in the pull request.
 
 ### Text
 
