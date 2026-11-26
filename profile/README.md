@@ -8,7 +8,7 @@ In development. Versions earlier than 1.0.0 are pre-releases: interfaces can cha
 
 ## Install nomux
 
-The newest version is 0.4.0. Install it with the script:
+Install the [newest version](https://github.com/nomux-sh/nomux/releases) with the script:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/nomux-sh/nomux/main/install.sh | sh
@@ -20,18 +20,18 @@ On macOS and Linux with Homebrew:
 brew install nomux-sh/tap/nomux
 ```
 
-## Released versions
+## Released parts
 
-| Part | Version | Install |
-|---|---|---|
-| [`nomux`](https://github.com/nomux-sh/nomux/releases) (`nomux`, `nomuxd`, `nomux-holder`) | 0.4.0 | The script or the Homebrew command above |
-| [`nomux-proto`](https://crates.io/crates/nomux-proto), the protocol crate for Rust | 0.11.0 | `cargo add nomux-proto` |
-| [`nomux-extension`](https://crates.io/crates/nomux-extension), the extension SDK for Rust | 0.1.2 | `cargo add nomux-extension` |
-| [`@nomux-sh/extension`](https://www.npmjs.com/package/@nomux-sh/extension), the extension SDK for TypeScript | 0.1.2 | `npm install @nomux-sh/extension` |
-| [`github.com/nomux-sh/extension-api/sdk/go`](https://pkg.go.dev/github.com/nomux-sh/extension-api/sdk/go), the extension SDK for Go | 0.1.2 | `go get github.com/nomux-sh/extension-api/sdk/go` |
-| [`nomux-theme`](https://crates.io/crates/nomux-theme), the theme loader for Rust | 0.3.0 | `cargo add nomux-theme` |
-| [`git`](https://github.com/nomux-sh/extensions/releases/tag/git@0.1.0) extension | 0.1.0 | Download the archive of your platform. See [Install a released extension](https://github.com/nomux-sh/extensions#install-a-released-extension). |
-| [`agent-claude`](https://github.com/nomux-sh/extensions/releases/tag/agent-claude@0.1.0) extension (adapter for Claude Code) | 0.1.0 | The same steps as for `git`. |
+| Part | Install |
+|---|---|
+| [`nomux`](https://github.com/nomux-sh/nomux/releases) (`nomux`, `nomuxd`, `nomux-holder`) | The script or the Homebrew command above |
+| [`nomux-proto`](https://crates.io/crates/nomux-proto), the protocol crate for Rust | `cargo add nomux-proto` |
+| [`nomux-extension`](https://crates.io/crates/nomux-extension), the extension SDK for Rust | `cargo add nomux-extension` |
+| [`@nomux-sh/extension`](https://www.npmjs.com/package/@nomux-sh/extension), the extension SDK for TypeScript | `npm install @nomux-sh/extension` |
+| [`github.com/nomux-sh/extension-api/sdk/go`](https://pkg.go.dev/github.com/nomux-sh/extension-api/sdk/go), the extension SDK for Go | `go get github.com/nomux-sh/extension-api/sdk/go` |
+| [`nomux-theme`](https://crates.io/crates/nomux-theme), the theme loader for Rust | `cargo add nomux-theme` |
+| [`git`](https://github.com/nomux-sh/extensions/releases) extension | Download the archive of your platform. See [Install a released extension](https://github.com/nomux-sh/extensions#install-a-released-extension). |
+| [`agent-claude`](https://github.com/nomux-sh/extensions/releases) extension (adapter for Claude Code) | The same steps as for `git`. |
 
 Each extension needs nomux 0.4.0 or later.
 
