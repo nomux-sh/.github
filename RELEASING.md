@@ -16,6 +16,7 @@ This guide applies to all repositories of the [nomux-sh](https://github.com/nomu
 - `git-cliff` writes the changelog from the commit subjects. The configuration is `cliff.toml` in the repository.
 - The types `feat`, `fix`, `perf`, `refactor`, `docs` and `revert` go into the changelog. A subject with `!` goes into the "Breaking changes" group.
 - The release note on GitHub is the changelog section of the version.
+- The `homebrew-tap` repository has no `CHANGELOG.md`, because its releases hold only the bottles of a nomux release.
 
 ## Steps
 
@@ -37,3 +38,8 @@ Do not move or delete a tag after it is public. To correct a release, publish a 
 | `docs` | The documentation site. Each merge to `main` publishes it. It has no version. |
 
 The code signing of macOS and Windows artifacts starts with the first stable release.
+
+## Dependency updates
+
+- Dependabot opens one pull request for each dependency update.
+- Do not add `groups` to a Dependabot configuration. A grouped update gets a pull request title that is longer than 70 characters, and the commit-subject check rejects it.
