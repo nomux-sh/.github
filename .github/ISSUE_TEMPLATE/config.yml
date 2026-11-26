@@ -5,4 +5,4 @@ contact_links:
     about: Do not open an issue for a vulnerability. Obey the security policy.
   - name: Code of conduct report
     url: https://github.com/nomux-sh/.github/blob/main/CODE_OF_CONDUCT.md
-    about: Send an email to we@nomux.sh.
+    about: Report it in private with the form at https://github.com/nomux-sh/.github/security/advisories/new.
