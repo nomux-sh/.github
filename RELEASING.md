@@ -41,5 +41,4 @@ The code signing of macOS and Windows artifacts starts with the first stable rel
 
 ## Dependency updates
 
-- Dependabot opens one pull request for each dependency update.
-- Do not add `groups` to a Dependabot configuration. A grouped update gets a pull request title that is longer than 70 characters, and the commit-subject check rejects it.
+Dependabot version updates run monthly, with one open pull request, and only for a new major version: each `dependabot.yml` ignores patch and minor updates. Do not add `groups` to a Dependabot configuration, because a grouped update gets a pull request title that is longer than 70 characters.
